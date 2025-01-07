@@ -1,0 +1,13 @@
+.cards {
+  display: flex;
+  flex-wrap: wrap;
+  flex-direction: row;
+  gap: 3rem;
+}
+
+.card {
+  width: 30%;
+}
+.card > img {
+  width: 100%;
+}

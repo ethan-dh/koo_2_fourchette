@@ -1,0 +1,144 @@
+.resaux {
+  width: 100%;
+  display: flex;
+  justify-content: end;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.top-bar {
+  display: flex;
+  flex-direction: row;
+}
+
+.top-bar-left-part {
+  padding-right: 2rem;
+  padding-left: 2rem;
+  width: 66%;
+}
+
+.logo_recherche {
+  display: flex;
+  flex-direction: row;
+  justify-items: center;
+}
+
+.recherche {
+  margin-left: 1rem;
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  height: 1.5rem;
+  border: solid;
+}
+
+#search-recette {
+  width: 100%;
+  border: 0;
+}
+
+#search-button {
+  cursor: pointer;
+  border-left: solid black;
+  padding: 0.25rem;
+  background-color: rgb(151, 30, 100);
+  color: white;
+}
+#search-button:hover {
+  background-color: black;
+  color: white;
+}
+
+.slogan {
+  width: 100%;
+  text-align: center;
+  font-weight: bold;
+}
+
+.top-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  width: 33%;
+}
+
+#login-buttons {
+  display: flex;
+  flex-direction: row;
+  gap: 0.5rem;
+  height: 50%;
+}
+
+.button {
+  border: none;
+  color: white;
+  width: 100%;
+  transition-duration: 200ms;
+}
+
+.button:hover {
+  color: white;
+  background-color: black;
+  cursor: pointer;
+}
+
+#login-button {
+  background-color: rgb(179, 212, 66);
+}
+#register-button {
+  background-color: rgb(65, 102, 171);
+}
+
+#deposer-recette-button {
+  background-color: rgb(151, 30, 100);
+  height: 50%;
+}
+#login-button:hover {
+  background-color: rgb(179, 212, 66);
+  color: white;
+  background-color: black;
+}
+#register-button:hover {
+  background-color: rgb(65, 102, 171);
+  color: white;
+  background-color: black;
+}
+
+#deposer-recette-button:hover {
+  background-color: rgb(151, 30, 100);
+  color: white;
+  background-color: black;
+  height: 50%;
+}
+
+nav {
+  background-color: rgb(151, 30, 100);
+  color: white;
+  width: 100%;
+  height: 3rem;
+  margin-top: 1rem;
+  display: flex;
+  align-items: center;
+}
+
+.navbar {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-evenly;
+  width: 100%;
+  padding-inline-start: 0;
+}
+
+.navlink {
+  list-style-type: none;
+  margin: auto auto;
+}
+.navlink > a {
+  text-decoration: none;
+  text-transform: uppercase;
+  color: white;
+}
+
+.navlink > a:hover {
+  text-decoration: underline;
+}
