@@ -11,28 +11,6 @@
 <body>
   <?php include 'header.php'; ?>
 
-  <form action="register.php" method="post" class="container">
-    <h1>Créer un compte</h1>
-
-    <label for="prenom">Prénom :</label>
-    <input type="text" name="prenom" required>
-
-    <label for="email">Email :</label>
-    <input type="email" name="email" required>
-
-    <label for="password">Mot de passe :</label>
-    <input type="password" name="password" required>
-
-    <label for="password_confirm">Confirmer le mot de passe :</label>
-    <input type="password" name="password_confirm" required>
-
-    <button type="submit" class="registerbtn">S'inscrire</button>
-
-    <div class="signin">
-      <p>Déjà un compte ? <a href="login.php">Se connecter</a></p>
-    </div>
-  </form>
-
   <?php
   if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $servername = "localhost";
@@ -45,33 +23,66 @@
       die("Connection failed: " . $conn->connect_error);
     }
 
-    $prenom = $_POST['prenom'];
-    $email = $_POST['email'];
-    $password = $_POST['password'];
-    $password_confirm = $_POST['password_confirm'];
+    // Vérifier si le login existe déjà
+    $stmt = $conn->prepare("SELECT idMembre FROM membres WHERE login = ?");
+    $stmt->bind_param("s", $_POST['login']);
+    $stmt->execute();
+    $result = $stmt->get_result();
 
-    if ($password !== $password_confirm) {
-      echo "<p style='color: red'>Les mots de passe ne correspondent pas.</p>";
-      exit;
-    }
-
-    $password_hash = password_hash($password, PASSWORD_DEFAULT);
-    $gravatar = "default.jpg"; // Image par défaut
-  
-    $stmt = $conn->prepare("INSERT INTO membres (prenom, email, password, gravatar) VALUES (?, ?, ?, ?)");
-    $stmt->bind_param("ssss", $prenom, $email, $password_hash, $gravatar);
-
-    if ($stmt->execute()) {
-      echo "<p style='color: green'>Compte créé avec succès !</p>";
-      header("Location: login.php");
+    if ($result->num_rows > 0) {
+      $error = "Ce login est déjà utilisé";
     } else {
-      echo "<p style='color: red'>Erreur lors de la création du compte.</p>";
-    }
+      // Traitement de l'image de profil
+      $gravatar = "default.png"; // Image par défaut
+      if (isset($_FILES['gravatar']) && $_FILES['gravatar']['error'] == 0) {
+        $target_dir = "photos/gravatars/";
+        $imageFileType = strtolower(pathinfo($_FILES["gravatar"]["name"], PATHINFO_EXTENSION));
+        $gravatar = uniqid() . "." . $imageFileType;
+        move_uploaded_file($_FILES["gravatar"]["tmp_name"], $target_dir . $gravatar);
+      }
 
-    $stmt->close();
+      $stmt = $conn->prepare("INSERT INTO membres (gravatar, login, password, statut, prenom, nom, dateCrea) VALUES (?, ?, ?, 'membre', ?, ?, NOW())");
+      $hashedPassword = sha1($_POST['password']);
+      $stmt->bind_param("sssss", $gravatar, $_POST['login'], $hashedPassword, $_POST['prenom'], $_POST['nom']);
+
+      if ($stmt->execute()) {
+        header("Location: login.php");
+        exit;
+      } else {
+        $error = "Erreur lors de l'inscription";
+      }
+    }
     $conn->close();
   }
   ?>
+
+  <form action="register.php" method="post" enctype="multipart/form-data" class="container">
+    <h1>Inscription</h1>
+
+    <?php if (isset($error))
+      echo "<p style='color: red'>$error</p>"; ?>
+
+    <label for="prenom">Prénom :</label>
+    <input type="text" name="prenom" required>
+
+    <label for="nom">Nom :</label>
+    <input type="text" name="nom" required>
+
+    <label for="login">Login :</label>
+    <input type="text" name="login" required>
+
+    <label for="password">Mot de passe :</label>
+    <input type="password" name="password" required>
+
+    <label for="gravatar">Photo de profil :</label>
+    <input type="file" name="gravatar" accept="image/*">
+
+    <button type="submit" class="registerbtn">S'inscrire</button>
+
+    <div class="signin">
+      <p>Déjà un compte ? <a href="login.php">Se connecter</a></p>
+    </div>
+  </form>
 </body>
 
 </html>

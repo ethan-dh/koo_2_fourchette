@@ -11,25 +11,7 @@
 <body>
   <?php include 'header.php'; ?>
 
-  <form action="login.php" method="post" class="container">
-    <h1>Se connecter</h1>
-
-    <label for="email">Email :</label>
-    <input type="email" name="email" required>
-
-    <label for="password">Mot de passe :</label>
-    <input type="password" name="password" required>
-
-    <button type="submit" class="registerbtn">Se connecter</button>
-
-    <div class="signin">
-      <p>Pas encore de compte ? <a href="register.php">S'inscrire</a></p>
-    </div>
-  </form>
-
   <?php
-  session_start();
-
   if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $servername = "localhost";
     $username = "root";
@@ -41,31 +23,46 @@
       die("Connection failed: " . $conn->connect_error);
     }
 
-    $email = $_POST['email'];
-    $password = $_POST['password'];
-
-    $stmt = $conn->prepare("SELECT idMembre, prenom, password FROM membres WHERE email = ?");
-    $stmt->bind_param("s", $email);
+    $login = $_POST['login'];
+    $password = sha1($_POST['password']); // Utilisation de SHA1 comme dans votre base
+  
+    $stmt = $conn->prepare("SELECT idMembre, prenom FROM membres WHERE login = ? AND password = ?");
+    $stmt->bind_param("ss", $login, $password);
     $stmt->execute();
     $result = $stmt->get_result();
 
-    if ($result->num_rows === 1) {
+    if ($result->num_rows > 0) {
       $user = $result->fetch_assoc();
-      if (password_verify($password, $user['password'])) {
-        $_SESSION['user_id'] = $user['idMembre'];
-        $_SESSION['prenom'] = $user['prenom'];
-        header("Location: index.php");
-      } else {
-        echo "<p style='color: red'>Mot de passe incorrect.</p>";
-      }
+      session_start();
+      $_SESSION['user_id'] = $user['idMembre'];
+      $_SESSION['prenom'] = $user['prenom'];
+      header("Location: index.php");
+      exit;
     } else {
-      echo "<p style='color: red'>Email non trouvé.</p>";
+      $error = "Login ou mot de passe incorrect";
     }
-
-    $stmt->close();
     $conn->close();
   }
   ?>
+
+  <form action="login.php" method="post" class="container">
+    <h1>Connexion</h1>
+
+    <?php if (isset($error))
+      echo "<p style='color: red'>$error</p>"; ?>
+
+    <label for="login">Login :</label>
+    <input type="text" name="login" required>
+
+    <label for="password">Mot de passe :</label>
+    <input type="password" name="password" required>
+
+    <button type="submit" class="registerbtn">Se connecter</button>
+
+    <div class="signin">
+      <p>Pas encore de compte ? <a href="register.php">Créer un compte</a></p>
+    </div>
+  </form>
 </body>
 
 </html>
